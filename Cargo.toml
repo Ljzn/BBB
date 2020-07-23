@@ -50,7 +50,8 @@ features = [
   'MessageEvent',
   'ErrorEvent',
   'ProgressEvent',
-  'BinaryType'
+  'BinaryType',
+  'CssStyleDeclaration'
 ]
 version = "0.3.22"
 

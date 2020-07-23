@@ -19,6 +19,22 @@ pub struct BitsocketResp {
     data: String,
 }
 
+pub fn insert_header(
+    document: &web_sys::Document,
+    body: &web_sys::HtmlElement,
+    content: String,
+) -> Result<(), JsValue> {
+    let h1 = document.create_element("h1")?;
+    h1.set_inner_html(&content);
+
+    let h1 = h1.dyn_into::<web_sys::HtmlElement>().unwrap();
+    h1.style().set_property("color", "purple")?;
+
+    body.append_child(&h1)?;
+
+    Ok(())
+}
+
 // This is like the `main` function, except for JavaScript.
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {
@@ -32,6 +48,11 @@ pub fn main_js() -> Result<(), JsValue> {
 
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
+
+    // header
+    let body = document.body().unwrap();
+
+    insert_header(&document, &body, "Bitcoin Beat Box".to_string()).unwrap();
 
     // Canvas
     let canvas = document.get_element_by_id("canvas").unwrap();
