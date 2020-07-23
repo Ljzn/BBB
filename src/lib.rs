@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+use serde_json;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::console;
@@ -9,6 +11,13 @@ use web_sys::console;
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+#[derive(Serialize, Deserialize)]
+pub struct BitsocketResp {
+    #[serde(rename = "type")]
+    t: String,
+    data: String,
+}
 
 // This is like the `main` function, except for JavaScript.
 #[wasm_bindgen(start)]
@@ -45,7 +54,12 @@ pub fn main_js() -> Result<(), JsValue> {
 
     let callback = Closure::wrap(Box::new(move |x: web_sys::MessageEvent| {
         let s = x.data().dyn_into::<js_sys::JsString>().unwrap();
-        console::log_1(&s);
+        // console::log_1(&s);
+
+        let d: JsValue = x.data();
+        let resp: BitsocketResp = serde_json::from_str(&d.as_string().unwrap()).unwrap();
+        console::log_1(&JsValue::from_str(&resp.data));
+
         // change box color
 
         let string = &s.as_string().unwrap()[25..31];
