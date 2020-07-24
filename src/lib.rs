@@ -35,6 +35,24 @@ pub fn insert_header(
     Ok(())
 }
 
+pub struct Counter {
+    count: i32,
+}
+
+impl Counter {
+    fn new() -> Self {
+        Counter { count: 0 }
+    }
+
+    fn click(&mut self) {
+        self.count += 1;
+    }
+
+    fn count_string(&self) -> String {
+        self.count.to_string()
+    }
+}
+
 // This is like the `main` function, except for JavaScript.
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {
@@ -91,6 +109,25 @@ pub fn main_js() -> Result<(), JsValue> {
     source.set_onmessage(Some(callback.as_ref().unchecked_ref()));
 
     callback.forget();
+
+    // Counter
+    let counter_text = document.create_element("p")?;
+    let counter_btn = document.create_element("button")?;
+
+    body.append_child(&counter_text)?;
+    body.append_child(&counter_btn)?;
+
+    let mut counter = Counter::new();
+    let add_one = Closure::wrap(Box::new(move || {
+        counter.click();
+        counter_text.set_inner_html(&counter.count_string());
+    }) as Box<dyn FnMut()>);
+
+    let counter_btn = counter_btn.dyn_into::<web_sys::HtmlElement>()?;
+    counter_btn.set_onclick(Some(add_one.as_ref().unchecked_ref()));
+    counter_btn.set_inner_html("Click");
+
+    add_one.forget();
 
     Ok(())
 }
